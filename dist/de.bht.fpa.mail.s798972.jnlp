@@ -11,11 +11,11 @@
   </resources>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="de.bht.fpa.mail.s798972.jar" size="3610" download="eager" />
+    <jar href="de.bht.fpa.mail.s798972.jar" size="9331" download="eager" />
   </resources>
   <applet-desc  width="800" height="600" main-class="com.javafx.main.NoJavaFXFallback"  name="de.bht.fpa.mail.s798972" >
     <param name="requiredFXVersion" value="8.0+"/>
   </applet-desc>
-  <jfx:javafx-desc  width="800" height="600" main-class="de.bht.fpa.mail.s798972.Main"  name="de.bht.fpa.mail.s798972" />
+  <jfx:javafx-desc  width="800" height="600" main-class="de.bht.fpa.mail.s798972.main.Main"  name="de.bht.fpa.mail.s798972" />
   <update check="always"/>
 </jnlp>

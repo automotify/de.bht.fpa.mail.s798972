@@ -1,9 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package de.bht.fpa.mail.s798972;
+
+package de.bht.fpa.mail.s798972.main;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -13,13 +9,14 @@ import javafx.stage.Stage;
 
 /**
  *
- * @author lukas
+ * @author Lukas Abegg
  */
+
 public class Main extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("view/FXMLMain.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("/de/bht/fpa/mail/s798972/view/FXMLMainView.fxml"));
         
         Scene scene = new Scene(root, 900, 600);
         
