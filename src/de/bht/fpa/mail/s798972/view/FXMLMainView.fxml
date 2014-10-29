@@ -16,7 +16,10 @@
          <items>
             <SplitPane dividerPositions="0.2255125284738041">
               <items>
-                <AnchorPane />
+                <AnchorPane>
+                     <children>
+                        <TreeView fx:id="explorerTreeView" onMouseClicked="#handleMouseClick" prefHeight="578.0" prefWidth="194.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                     </children></AnchorPane>
                   <SplitPane dividerPositions="0.5" orientation="VERTICAL">
                     <items>
                       <AnchorPane />
