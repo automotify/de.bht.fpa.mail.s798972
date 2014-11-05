@@ -8,18 +8,18 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" >
+<VBox prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
       <SplitPane dividerPositions="0.5" orientation="VERTICAL" VBox.vgrow="ALWAYS">
          <items>
             <AnchorPane>
                <children>
-                  <ListView fx:id="listView" layoutX="47.0" layoutY="-12.0" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="250.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                  <ListView fx:id="listView" layoutX="-8.0" layoutY="14.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                </children>
             </AnchorPane>
-            <AnchorPane maxHeight="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="75.0" prefWidth="160.0">
+            <AnchorPane maxHeight="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
                <children>
-                  <FlowPane alignment="CENTER_RIGHT" columnHalignment="RIGHT" maxHeight="-Infinity" minHeight="-Infinity" prefHeight="75.0" rowValignment="BOTTOM" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                  <FlowPane alignment="CENTER_RIGHT" columnHalignment="RIGHT" rowValignment="BOTTOM" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
                         <Button id="cancelButton" fx:id="cancelButton" mnemonicParsing="false" text="Cancel">
                            <opaqueInsets>

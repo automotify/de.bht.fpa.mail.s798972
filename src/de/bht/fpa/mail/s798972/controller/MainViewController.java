@@ -3,6 +3,7 @@ package de.bht.fpa.mail.s798972.controller;
 import de.bht.fpa.mail.s798972.model.applicationLogic.FileManager;
 import de.bht.fpa.mail.s798972.model.applicationLogic.FolderManagerIF;
 import de.bht.fpa.mail.s798972.model.data.Component;
+import de.bht.fpa.mail.s798972.model.data.FileElement;
 import de.bht.fpa.mail.s798972.model.data.Folder;
 import java.io.File;
 import java.io.IOException;
@@ -38,16 +39,18 @@ public class MainViewController implements Initializable {
 
     private FolderManagerIF folderManager;
 
-    private static Image FOLDERICON; 
+    private static Image FOLDERICON;
+    private static Image FILEICON;
     private static File DEFAULTROOT;
-            
+
     private final List<File> historyList = new ArrayList<>();
-    
-    public MainViewController(){
-       FOLDERICON = new Image(getClass().getResourceAsStream("folder_icon.png"));
-       DEFAULTROOT = new File("/");
+
+    public MainViewController() {
+        FOLDERICON = new Image(getClass().getResourceAsStream("folder_icon.png"));
+        FILEICON = new Image(getClass().getResourceAsStream("file_icon.png"));
+        DEFAULTROOT = new File("/");
     }
-    
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         configureTree();
@@ -68,18 +71,19 @@ public class MainViewController implements Initializable {
         rootItem.setExpanded(true);
         rootItem.addEventHandler(TreeItem.branchExpandedEvent(), (TreeModificationEvent<Component> e) -> handleTreeItemExpandedEvent(e));
         explorerTreeView.setRoot(rootItem);
-   
-        if(rootPath != DEFAULTROOT){
+
+        if (rootPath != DEFAULTROOT) {
             Boolean found = false;
-            for (File item : historyList){
-                if (item.equals(rootPath)){ 
+            for (File item : historyList) {
+                if (item.equals(rootPath)) {
                     found = true;
                     break;
-                } 
+                }
             }
-           
+
             if (!found) {
-                historyList.add(rootPath);}
+                historyList.add(rootPath);
+            }
         }
 
         loadTreeItemContent(rootItem);
@@ -89,13 +93,18 @@ public class MainViewController implements Initializable {
         Folder folder = (Folder) node.getValue();
         node.getChildren().removeAll(node.getChildren().sorted());
         TreeItem<Component> dummyItem = new TreeItem<>(new Folder(new File("/"), true));
-        
+
         folderManager.loadContent(folder);
 
-        folder.getComponents().stream().map((subFolder) -> {
-            TreeItem<Component> subItem = new TreeItem<>(subFolder, new ImageView(FOLDERICON));
-            if (subFolder.isExpandable()) {
-                subItem.getChildren().add(dummyItem);
+        folder.getComponents().stream().map((Component subFolder) -> {
+            TreeItem<Component> subItem;
+            if (subFolder instanceof FileElement) {
+                subItem = new TreeItem<>(subFolder, new ImageView(FILEICON));
+            } else {
+                subItem = new TreeItem<>(subFolder, new ImageView(FOLDERICON));
+                if (subFolder.isExpandable()) {
+                    subItem.getChildren().add(dummyItem);
+                }
             }
             return subItem;
         }).forEach((subItem) -> {
@@ -153,21 +162,18 @@ public class MainViewController implements Initializable {
 
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(location);
-         fxmlLoader.setController(new BaseDirHistoryViewController(this));
+        fxmlLoader.setController(new BaseDirHistoryViewController(this));
         try {
             Pane myPane = (Pane) fxmlLoader.load();
             Scene myScene = new Scene(myPane);
             editStage.setScene(myScene);
             editStage.show();
         } catch (IOException ex) {
-            System.err.println("Error by loading view FXMLBaseDirHistoryView "+ex.getMessage());
+            System.err.println("Error by loading view FXMLBaseDirHistoryView " + ex.getMessage());
         }
     }
-    
-    public List<File> getHistoryList(){
-        for (File f: historyList){
-            System.out.println(f.getName());
-        }
+
+    public List<File> getHistoryList() {
         return historyList;
     }
 }
