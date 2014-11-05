@@ -12,17 +12,6 @@
       <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
    </padding>
    <children>
-      <MenuBar fx:id="menuBar">
-        <menus>
-          <Menu mnemonicParsing="false" text="Account" />
-          <Menu mnemonicParsing="false" text="File">
-            <items>
-              <MenuItem id="fileOpen" mnemonicParsing="false" text="Open" />
-                  <MenuItem id="fileHistory" mnemonicParsing="false" text="History" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
       <SplitPane VBox.vgrow="ALWAYS">
          <items>
             <SplitPane dividerPositions="0.2255125284738041">
