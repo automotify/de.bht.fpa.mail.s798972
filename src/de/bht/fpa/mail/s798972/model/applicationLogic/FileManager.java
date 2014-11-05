@@ -23,7 +23,7 @@ public class FileManager implements FolderManagerIF {
     public FileManager(File file) {
         topFolder = new Folder(file, true);
     }
-
+    
     @Override
     public Folder getTopFodler() {
         return topFolder;
@@ -33,23 +33,19 @@ public class FileManager implements FolderManagerIF {
      * Loads all relevant content in the directory path of a folder object into
      * the folder.
      *
-     * @param f the folder into which the content of the corresponding directory should be loaded
+     * @param f the folder into which the content of the corresponding directory
+     * should be loaded
      */
     @Override
     public void loadContent(Folder f) {
-        if (f.isExpandable()) {
+        if (hasSubFiles(new File(f.getPath()))) {
             f.getComponents().removeAll(f.getComponents());
             for (final File path : new File(f.getPath()).listFiles()) {
-                if(path.getName().startsWith(".")) continue; // keine versteckten Files anzeigen
+                if (path.getName().startsWith(".")) {
+                    continue; // keine versteckten Files anzeigen
+                }
                 if (path.isDirectory()) {
-                    boolean hasSubFiles = false;
-                    try {
-                        hasSubFiles = path.list().length > 0;
-                    } catch (Exception e) {
-                        System.out.println(path.getName());
-                        System.out.println("Error by reading length of: " + e.getMessage());
-                    }
-                    final Folder subFolder = new Folder(path, hasSubFiles);
+                    final Folder subFolder = new Folder(path, hasSubFiles(path));
                     f.addComponent(subFolder);
                 } else {
                     final FileElement subFile = new FileElement(path);
@@ -57,5 +53,15 @@ public class FileManager implements FolderManagerIF {
                 }
             }
         }
+    }
+    
+    private Boolean hasSubFiles(File path) {
+        try {
+            return path.list().length > 0;
+        } catch (Exception e) {
+            System.out.println(path.getName());
+            System.out.println("Error by reading length of: " + e.getMessage());
+        }
+        return false;
     }
 }

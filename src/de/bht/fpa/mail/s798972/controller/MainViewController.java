@@ -11,14 +11,12 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.function.Consumer;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
@@ -41,13 +39,16 @@ public class MainViewController implements Initializable {
 
     private FolderManagerIF folderManager;
 
-    private final Image folderIcon = new Image(getClass().getResourceAsStream("folder_icon.png"));
-
-    private final TreeItem<Component> dummyItem = new TreeItem<>(new Folder(new File("/"), true));
-
-    private final File defaultRoot = new File("/Users");
-    private final List<File> rootList = new ArrayList<>();
-
+    private static Image FOLDERICON; 
+    private static File DEFAULTROOT;
+            
+    private final List<File> historyList = new ArrayList<>();
+    
+    public MainViewController(){
+       FOLDERICON = new Image(getClass().getResourceAsStream("folder_icon.png"));
+       DEFAULTROOT = new File("/Users");
+    }
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         configureTree();
@@ -55,7 +56,7 @@ public class MainViewController implements Initializable {
     }
 
     public void configureTree() {
-        setRootItemTreeView(defaultRoot);
+        setRootItemTreeView(DEFAULTROOT);
     }
 
     /**
@@ -64,13 +65,22 @@ public class MainViewController implements Initializable {
      */
     public void setRootItemTreeView(File rootPath) {
         folderManager = new FileManager(rootPath);
-        TreeItem<Component> rootItem = new TreeItem<>(folderManager.getTopFodler(), new ImageView(folderIcon));
+        TreeItem<Component> rootItem = new TreeItem<>(folderManager.getTopFodler(), new ImageView(FOLDERICON));
         rootItem.setExpanded(true);
         rootItem.addEventHandler(TreeItem.branchExpandedEvent(), (TreeModificationEvent<Component> e) -> handleTreeItemExpandedEvent(e));
         explorerTreeView.setRoot(rootItem);
-        
-        if(rootPath != defaultRoot){
-            rootList.add(rootPath);
+   
+        if(rootPath != DEFAULTROOT){
+            Boolean found = false;
+            for (File item : historyList){
+                if (item.equals(rootPath)){ 
+                    found = true;
+                    break;
+                } 
+            }
+           
+            if (!found) {
+                historyList.add(rootPath);}
         }
 
         loadTreeItemContent(rootItem);
@@ -78,41 +88,45 @@ public class MainViewController implements Initializable {
 
     private void loadTreeItemContent(TreeItem<Component> node) {
         Folder folder = (Folder) node.getValue();
+        node.getChildren().removeAll(node.getChildren().sorted());
+        TreeItem<Component> dummyItem = new TreeItem<>(new Folder(new File("/"), true));
+        
         folderManager.loadContent(folder);
 
-        for (Component subFolder : folder.getComponents()) {
-            TreeItem<Component> subItem = new TreeItem<>(subFolder, new ImageView(folderIcon));
+        folder.getComponents().stream().map((subFolder) -> {
+            TreeItem<Component> subItem = new TreeItem<>(subFolder, new ImageView(FOLDERICON));
             if (subFolder.isExpandable()) {
                 subItem.getChildren().add(dummyItem);
             }
+            return subItem;
+        }).forEach((subItem) -> {
             node.getChildren().add(subItem);
-        }
+        });
     }
 
     private void handleTreeItemExpandedEvent(TreeModificationEvent<Component> event) {
         TreeItem<Component> expandItem = event.getTreeItem();
 
         System.out.println("-------- load childeren of item: " + expandItem.getValue().getName());
-        expandItem.getChildren().removeAll(expandItem.getChildren().sorted());
         loadTreeItemContent(expandItem);
     }
 
     public void configureMenue() {
-        for (Menu m : menuBar.getMenus()) {
-            for (MenuItem item : m.getItems()) {
+        menuBar.getMenus().stream().forEach((m) -> {
+            m.getItems().stream().forEach((item) -> {
                 item.setOnAction((event) -> handleMenuItemEvent(event));
-            }
-        }
+            });
+        });
     }
 
-    final String menuIdFileOpen = "fileOpen";
-    final String menuIdFileHistory = "fileHistory";
+    private final static String MENU_ID_FILE_OPEN = "fileOpen";
+    private final static String MENU_ID_FILE_HISTORY = "fileHistory";
 
     private void handleMenuItemEvent(Event event) {
         final MenuItem item = (MenuItem) event.getSource();
 
         switch (item.getId()) {
-            case menuIdFileOpen: {
+            case MENU_ID_FILE_OPEN: {
                 File file = openFile();
                 if (file != null) {
                     System.out.println("Root Item set on: " + file.getAbsolutePath());
@@ -120,7 +134,7 @@ public class MainViewController implements Initializable {
                 }
                 break;
             }
-            case menuIdFileHistory: {
+            case MENU_ID_FILE_HISTORY: {
                 showBaseDirHistoryView();
                 break;
             }
@@ -140,17 +154,18 @@ public class MainViewController implements Initializable {
 
         FXMLLoader fxmlLoader = new FXMLLoader();
         fxmlLoader.setLocation(location);
+         fxmlLoader.setController(new BaseDirHistoryViewController(this));
         try {
             Pane myPane = (Pane) fxmlLoader.load();
             Scene myScene = new Scene(myPane);
             editStage.setScene(myScene);
             editStage.show();
         } catch (IOException ex) {
-            Logger.getLogger(MainViewController.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("Error by loading view FXMLBaseDirHistoryView "+ex.getMessage());
         }
     }
     
-    public List<File> getRootList(){
-        return rootList;
+    public List<File> getHistoryList(){
+        return historyList;
     }
 }
