@@ -10,12 +10,12 @@ import java.util.List;
  */
 public class Folder extends Component {
 
-    private ArrayList<Component> content;
-    private boolean expandable;
+    private final ArrayList<Component> content;
+    private final boolean expandable;
     
     public Folder(File path, boolean expandable) {
         super(path);
-        content = new ArrayList<Component>();
+        content = new ArrayList<>();
 	this.expandable = expandable;
     }
 

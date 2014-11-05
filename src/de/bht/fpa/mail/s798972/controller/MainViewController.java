@@ -48,7 +48,7 @@ public class MainViewController implements Initializable {
     public MainViewController() {
         FOLDERICON = new Image(getClass().getResourceAsStream("folder_icon.png"));
         FILEICON = new Image(getClass().getResourceAsStream("file_icon.png"));
-        DEFAULTROOT = new File("/");
+        DEFAULTROOT = new File("/Users");
     }
 
     @Override

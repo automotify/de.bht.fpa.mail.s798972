@@ -46,6 +46,7 @@ public abstract class Component {
         return path;
     }
 
+    @Override
     public String toString() {
         return name;
     }
