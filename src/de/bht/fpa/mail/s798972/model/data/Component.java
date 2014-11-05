@@ -6,8 +6,6 @@ import java.util.List;
 
 /*
  * This is the component part of a composite pattern.
- * 
- * @author Simone Strippgen
  */
 
 public abstract class Component {

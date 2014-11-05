@@ -1,78 +1,156 @@
 package de.bht.fpa.mail.s798972.controller;
 
-import de.bht.fpa.mail.s798972.model.data.FileElement;
+import de.bht.fpa.mail.s798972.model.applicationLogic.FileManager;
+import de.bht.fpa.mail.s798972.model.applicationLogic.FolderManagerIF;
 import de.bht.fpa.mail.s798972.model.data.Component;
 import de.bht.fpa.mail.s798972.model.data.Folder;
 import java.io.File;
+import java.io.IOException;
+
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
-import javafx.event.ActionEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javafx.event.Event;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Node;
-import javafx.scene.control.Label;
+import javafx.scene.Scene;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeItem.TreeModificationEvent;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-
+import javafx.scene.layout.Pane;
+import javafx.stage.DirectoryChooser;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class MainViewController implements Initializable {
 
     @FXML
-    TreeView explorerTreeView;
+    private TreeView explorerTreeView;
 
     @FXML
-    private Label label;
+    private MenuBar menuBar;
+
+    private FolderManagerIF folderManager;
+
+    private final Image folderIcon = new Image(getClass().getResourceAsStream("folder_icon.png"));
+
+    private final TreeItem<Component> dummyItem = new TreeItem<>(new Folder(new File("/"), true));
+
+    private final File defaultRoot = new File("/Users");
+    private final List<File> rootList = new ArrayList<>();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         configureTree();
+        configureMenue();
     }
-    
-    @FXML
-    private void handleButtonAction(ActionEvent event) {
-        //   System.out.println("You clicked me!");
-        //   label.setText("Hello World!");
-    }
-
-    private final Node folderIcon = new ImageView(
-            new Image(getClass().getResourceAsStream("folder_icon.png"))
-    );
-    private final Node fileIcon = new ImageView(
-            new Image(getClass().getResourceAsStream("file_icon.png"))
-    );
 
     public void configureTree() {
-        File rootPath = new File("/Users");
-        TreeItem<Component> rootItem = new TreeItem<> (new Folder(rootPath, true), folderIcon);
-        rootItem.setExpanded(true);       
-        explorerTreeView.setRoot(rootItem);        
- 
-        loadContent(rootPath, rootItem);
-    }   
+        setRootItemTreeView(defaultRoot);
+    }
 
-    public void loadContent(final File nodePath, TreeItem node) {
-        for (final File path : nodePath.listFiles()) {
-            if (path.isDirectory()) {
-                boolean isEmpty = path.list().length > 0;
-                System.out.println("Folder: "+path.getName()+" / "+isEmpty);
-                
-                TreeItem<Folder> folder = new TreeItem<> (new Folder(path, true), folderIcon);
-                node.getChildren().add(folder);
-            } else {
-                TreeItem<FileElement> file = new TreeItem<> (new FileElement(path), fileIcon);
-                node.getChildren().add(file);
+    /**
+     *
+     * @param rootPath
+     */
+    public void setRootItemTreeView(File rootPath) {
+        folderManager = new FileManager(rootPath);
+        TreeItem<Component> rootItem = new TreeItem<>(folderManager.getTopFodler(), new ImageView(folderIcon));
+        rootItem.setExpanded(true);
+        rootItem.addEventHandler(TreeItem.branchExpandedEvent(), (TreeModificationEvent<Component> e) -> handleTreeItemExpandedEvent(e));
+        explorerTreeView.setRoot(rootItem);
+        
+        if(rootPath != defaultRoot){
+            rootList.add(rootPath);
+        }
+
+        loadTreeItemContent(rootItem);
+    }
+
+    private void loadTreeItemContent(TreeItem<Component> node) {
+        Folder folder = (Folder) node.getValue();
+        folderManager.loadContent(folder);
+
+        for (Component subFolder : folder.getComponents()) {
+            TreeItem<Component> subItem = new TreeItem<>(subFolder, new ImageView(folderIcon));
+            if (subFolder.isExpandable()) {
+                subItem.getChildren().add(dummyItem);
+            }
+            node.getChildren().add(subItem);
+        }
+    }
+
+    private void handleTreeItemExpandedEvent(TreeModificationEvent<Component> event) {
+        TreeItem<Component> expandItem = event.getTreeItem();
+
+        System.out.println("-------- load childeren of item: " + expandItem.getValue().getName());
+        expandItem.getChildren().removeAll(expandItem.getChildren().sorted());
+        loadTreeItemContent(expandItem);
+    }
+
+    public void configureMenue() {
+        for (Menu m : menuBar.getMenus()) {
+            for (MenuItem item : m.getItems()) {
+                item.setOnAction((event) -> handleMenuItemEvent(event));
             }
         }
     }
-    
-    @FXML
-    public void handleMouseClick(ActionEvent event) {
-        System.out.println(event.toString() + "\n");
-        
-        TreeItem<Component> node = (TreeItem) event.getSource();
-        loadContent(new File(node.getValue().getPath()), node);
+
+    final String menuIdFileOpen = "fileOpen";
+    final String menuIdFileHistory = "fileHistory";
+
+    private void handleMenuItemEvent(Event event) {
+        final MenuItem item = (MenuItem) event.getSource();
+
+        switch (item.getId()) {
+            case menuIdFileOpen: {
+                File file = openFile();
+                if (file != null) {
+                    System.out.println("Root Item set on: " + file.getAbsolutePath());
+                    setRootItemTreeView(file);
+                }
+                break;
+            }
+            case menuIdFileHistory: {
+                showBaseDirHistoryView();
+                break;
+            }
+        }
     }
 
+    private File openFile() {
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        directoryChooser.setTitle("FPA Mailer File Explorer");
+        return directoryChooser.showDialog(null);
+    }
+
+    private void showBaseDirHistoryView() {
+        Stage editStage = new Stage(StageStyle.UTILITY);
+        editStage.setTitle("FPA Mail Base Direction History");
+        URL location = getClass().getResource("/de/bht/fpa/mail/s798972/view/FXMLBaseDirHistoryView.fxml");
+
+        FXMLLoader fxmlLoader = new FXMLLoader();
+        fxmlLoader.setLocation(location);
+        try {
+            Pane myPane = (Pane) fxmlLoader.load();
+            Scene myScene = new Scene(myPane);
+            editStage.setScene(myScene);
+            editStage.show();
+        } catch (IOException ex) {
+            Logger.getLogger(MainViewController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public List<File> getRootList(){
+        return rootList;
+    }
 }

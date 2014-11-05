@@ -5,8 +5,6 @@ import java.io.File;
 
 /*
  * This is the leaf part of a composite pattern.
- * 
- * @author Simone Strippgen
  */
 
 public class FileElement extends Component {

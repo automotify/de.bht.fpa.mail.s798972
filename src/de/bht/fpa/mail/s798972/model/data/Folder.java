@@ -7,7 +7,6 @@ import java.util.List;
 
 /**
  * 
- * @author Simone Strippgen
  */
 public class Folder extends Component {
 
