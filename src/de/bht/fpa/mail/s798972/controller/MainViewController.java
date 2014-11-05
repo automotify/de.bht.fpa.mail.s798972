@@ -11,7 +11,6 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 import javafx.event.Event;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -46,7 +45,7 @@ public class MainViewController implements Initializable {
     
     public MainViewController(){
        FOLDERICON = new Image(getClass().getResourceAsStream("folder_icon.png"));
-       DEFAULTROOT = new File("/Users");
+       DEFAULTROOT = new File("/");
     }
     
     @Override
@@ -166,6 +165,9 @@ public class MainViewController implements Initializable {
     }
     
     public List<File> getHistoryList(){
+        for (File f: historyList){
+            System.out.println(f.getName());
+        }
         return historyList;
     }
 }

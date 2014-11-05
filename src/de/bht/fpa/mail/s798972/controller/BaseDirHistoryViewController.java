@@ -9,7 +9,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -50,12 +49,15 @@ public class BaseDirHistoryViewController implements Initializable {
     
     private void fillList(){
         listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        List<File> listHistory =  mainController.getHistoryList();
-        if (listHistory.isEmpty()) {
-            listHistory.add(new File("now base directories in history"));
-        }
         listView.getItems().removeAll(listView.getItems());
-        listView.getItems().addAll(listHistory);
+        
+        List<File> listHistory = mainController.getHistoryList();
+        if (listHistory.isEmpty()) {
+            listView.getItems().add(new File("now base directories in history"));
+            okButton.setDisable(true);
+        }else{
+            listView.getItems().addAll(listHistory);
+        }
     }
 
     private void close(Window w) {
@@ -67,7 +69,7 @@ public class BaseDirHistoryViewController implements Initializable {
     private static final String BUTTON_CANCEL = "cancelButton";
 
     private void handleButtonEvent(ActionEvent event) {
-        Button b = (Button) event.getSource();
+        final Button b = (Button) event.getSource();
 
         switch (b.getId()) {
             case BUTTON_OK: {
