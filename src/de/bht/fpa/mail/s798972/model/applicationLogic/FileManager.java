@@ -38,6 +38,7 @@ public class FileManager implements FolderManagerIF {
     @Override
     public void loadContent(Folder f) {
         if (f.isExpandable()) {
+            f.getComponents().removeAll(f.getComponents());
             for (final File path : new File(f.getPath()).listFiles()) {
                 if(path.getName().startsWith(".")) continue; // keine versteckten Files anzeigen
                 if (path.isDirectory()) {
