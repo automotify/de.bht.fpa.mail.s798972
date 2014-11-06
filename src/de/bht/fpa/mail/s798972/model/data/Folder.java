@@ -1,22 +1,30 @@
-
 package de.bht.fpa.mail.s798972.model.data;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * 
- */
+
 public class Folder extends Component {
 
-    private final ArrayList<Component> content;
     private final boolean expandable;
-    
+    private final ArrayList<Component> content;
+    private final ArrayList<Email> emails;
+
     public Folder(File path, boolean expandable) {
         super(path);
+        this.expandable = expandable;
         content = new ArrayList<>();
-	this.expandable = expandable;
+        emails = new ArrayList<>();
+    }
+
+    /**
+     *
+     * @return
+     */
+    @Override
+    public boolean isExpandable() {
+        return expandable;
     }
 
     @Override
@@ -29,9 +37,11 @@ public class Folder extends Component {
         return content;
     }
 
-    @Override
-    public boolean isExpandable() {
-        return expandable;
+    public List<Email> getEmails() {
+        return emails;
     }
-    
-}
+
+    public void addEmail(Email message) {
+        emails.add(message);
+    }
+ }

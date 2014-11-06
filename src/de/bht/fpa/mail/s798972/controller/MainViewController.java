@@ -1,9 +1,8 @@
 package de.bht.fpa.mail.s798972.controller;
 
-import de.bht.fpa.mail.s798972.model.applicationLogic.FileManager;
-import de.bht.fpa.mail.s798972.model.applicationLogic.FolderManagerIF;
+import de.bht.fpa.mail.s798972.model.applicationLogic.EmailManagerIF;
+import de.bht.fpa.mail.s798972.model.applicationLogic.XmlEmailManager;
 import de.bht.fpa.mail.s798972.model.data.Component;
-import de.bht.fpa.mail.s798972.model.data.FileElement;
 import de.bht.fpa.mail.s798972.model.data.Folder;
 import java.io.File;
 import java.io.IOException;
@@ -37,17 +36,17 @@ public class MainViewController implements Initializable {
     @FXML
     private MenuBar menuBar;
 
-    private FolderManagerIF folderManager;
+    private EmailManagerIF folderManager;
 
     private static Image FOLDERICON;
-    private static Image FILEICON;
+    private static Image FOLDERICON_OPEN;
     private static File DEFAULTROOT;
 
     private final List<File> historyList = new ArrayList<>();
 
     public MainViewController() {
         FOLDERICON = new Image(getClass().getResourceAsStream("folder_icon.png"));
-        FILEICON = new Image(getClass().getResourceAsStream("file_icon.png"));
+        FOLDERICON_OPEN = new Image(getClass().getResourceAsStream("folder_open_icon.png"));
         DEFAULTROOT = new File("/Users");
     }
 
@@ -66,10 +65,13 @@ public class MainViewController implements Initializable {
      * @param rootPath
      */
     public void setRootItemTreeView(File rootPath) {
-        folderManager = new FileManager(rootPath);
+        folderManager = new XmlEmailManager(rootPath);
         TreeItem<Component> rootItem = new TreeItem<>(folderManager.getTopFodler(), new ImageView(FOLDERICON));
         rootItem.setExpanded(true);
-        rootItem.addEventHandler(TreeItem.branchExpandedEvent(), (TreeModificationEvent<Component> e) -> handleTreeItemExpandedEvent(e));
+        rootItem.addEventHandler(TreeItem.branchExpandedEvent(), (TreeModificationEvent<Component> e) -> handleTreeItemExpandCollapseEvent(e));
+        rootItem.addEventHandler(TreeItem.branchCollapsedEvent(), (TreeModificationEvent<Component> e) -> handleTreeItemExpandCollapseEvent(e));
+
+        explorerTreeView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleLoadEmailEvent((TreeItem<Component>) newValue));
         explorerTreeView.setRoot(rootItem);
 
         if (rootPath != DEFAULTROOT) {
@@ -96,27 +98,30 @@ public class MainViewController implements Initializable {
 
         folderManager.loadContent(folder);
 
-        folder.getComponents().stream().map((Component subFolder) -> {
-            TreeItem<Component> subItem;
-            if (subFolder instanceof FileElement) {
-                subItem = new TreeItem<>(subFolder, new ImageView(FILEICON));
-            } else {
+        for (Component subFolder : folder.getComponents()) {
+            TreeItem<Component> subItem = null;
+
+            if (subFolder instanceof Folder) {
                 subItem = new TreeItem<>(subFolder, new ImageView(FOLDERICON));
                 if (subFolder.isExpandable()) {
                     subItem.getChildren().add(dummyItem);
                 }
             }
-            return subItem;
-        }).forEach((subItem) -> {
             node.getChildren().add(subItem);
-        });
+        }
+
     }
 
-    private void handleTreeItemExpandedEvent(TreeModificationEvent<Component> event) {
+    private void handleTreeItemExpandCollapseEvent(TreeModificationEvent<Component> event) {
         TreeItem<Component> expandItem = event.getTreeItem();
 
         System.out.println("-------- load childeren of item: " + expandItem.getValue().getName());
-        loadTreeItemContent(expandItem);
+        if (event.getEventType().equals(TreeItem.branchExpandedEvent())) {
+            setFolderExpandedIcon(expandItem, true);
+            loadTreeItemContent(expandItem);
+        } else if (event.getEventType().equals(TreeItem.branchCollapsedEvent())) {
+            setFolderExpandedIcon(expandItem, false);
+        }
     }
 
     public void configureMenue() {
@@ -175,5 +180,18 @@ public class MainViewController implements Initializable {
 
     public List<File> getHistoryList() {
         return historyList;
+    }
+
+    private void setFolderExpandedIcon(TreeItem<Component> node, boolean expand) {
+        if (expand) {
+            node.setGraphic(new ImageView(FOLDERICON_OPEN));
+        } else {
+            node.setGraphic(new ImageView(FOLDERICON));
+        }
+    }
+
+    private void handleLoadEmailEvent(TreeItem<Component> item) {
+        System.out.println("Selected Text : " + item.getValue());
+        folderManager.printFolderContent((Folder) item.getValue());
     }
 }
