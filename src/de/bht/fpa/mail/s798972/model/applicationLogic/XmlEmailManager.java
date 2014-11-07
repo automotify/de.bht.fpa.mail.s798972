@@ -7,7 +7,6 @@ import java.util.List;
 import javax.xml.bind.DataBindingException;
 import javax.xml.bind.JAXB;
 
-
 public class XmlEmailManager implements EmailManagerIF {
 
     //top Folder of the managed hierarchy
@@ -33,8 +32,8 @@ public class XmlEmailManager implements EmailManagerIF {
      * Loads all relevant content in the directory path of a folder object into
      * the folder.
      *
-     * @param folder the folder into which the content of the corresponding directory
-     * should be loaded
+     * @param folder the folder into which the content of the corresponding
+     * directory should be loaded
      */
     @Override
     public void loadContent(Folder folder) {
@@ -47,48 +46,50 @@ public class XmlEmailManager implements EmailManagerIF {
                 }
             }
         }
-        // load emails from directory if directory has no email added
-        if (folder.getEmails().isEmpty()) loadEmails(folder);
     }
 
     private Boolean hasSubFolders(File path) {
         try {
-            for (File f: path.listFiles()){
-                if (f.isDirectory()) return true;
+            for (File f : path.listFiles()) {
+                if (f.isDirectory()) {
+                    return true;
+                }
             }
         } catch (Exception e) {
             System.out.println(path.getName());
-            System.out.println("Error by reading length of: " + e.getMessage());
+            System.out.println("Permission error by reading length of: " + e.getMessage());
         }
         return false;
     }
-   
 
     @Override
     public void loadEmails(Folder folder) {
-        for (File f: new File(folder.getPath()).listFiles()){
-            if (f.isFile() && f.getName().endsWith(".xml")){
-                try{
-                  folder.addEmail(JAXB.unmarshal(f, Email.class));  
-                }catch(DataBindingException e){
-                    System.out.println("XML is not conform, error see below: "+e.getMessage());
-                } 
+        for (File f : new File(folder.getPath()).listFiles()) {
+            if (f.isFile() && f.getName().endsWith(".xml")) {
+                try {
+                    folder.addEmail(JAXB.unmarshal(f, Email.class));
+                } catch (DataBindingException e) {
+                    System.out.println("XML is not conform, error see below: " + e.getMessage());
+                }
             }
         }
     }
 
     @Override
     public void printFolderContent(Folder folder) {
-        System.out.println("Check for emails.................");
+        if (folder.getEmails().isEmpty()) {
+            loadEmails(folder);
+        }
+
         List<Email> list = folder.getEmails();
-        
+
         //full path of directory
-        System.out.println("Selected directory: "+folder.getPath());
+        System.out.println("Selected directory: " + folder.getPath());
         //number of emails
-        System.out.println("Number of emails: "+folder.getEmails().size());
-        
+        System.out.println("Number of emails: " + folder.getEmails().size());
+
         //list emails
-        for (Email email : list){
+        for (Email email : list) {
             System.out.printf("[Email: sender=%s received=%s subject=%s] %n", email.getSender(), email.getReceived(), email.getSubject());
         }
         System.out.println("End of check for emails.................");

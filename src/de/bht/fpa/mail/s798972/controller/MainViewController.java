@@ -47,7 +47,7 @@ public class MainViewController implements Initializable {
     public MainViewController() {
         FOLDERICON = new Image(getClass().getResourceAsStream("folder_icon.png"));
         FOLDERICON_OPEN = new Image(getClass().getResourceAsStream("folder_open_icon.png"));
-        DEFAULTROOT = new File("/Users");
+        DEFAULTROOT = new File("/Users/lukas/git-projects/de.bht.fpa.mail.s798972/emailData/Account");
     }
 
     @Override
@@ -113,14 +113,15 @@ public class MainViewController implements Initializable {
     }
 
     private void handleTreeItemExpandCollapseEvent(TreeModificationEvent<Component> event) {
-        TreeItem<Component> expandItem = event.getTreeItem();
+        TreeItem<Component> item = event.getTreeItem();
 
-        System.out.println("-------- load childeren of item: " + expandItem.getValue().getName());
         if (event.getEventType().equals(TreeItem.branchExpandedEvent())) {
-            setFolderExpandedIcon(expandItem, true);
-            loadTreeItemContent(expandItem);
+            System.out.println("-------- expand item: " + item.getValue().getName());
+            setFolderExpandedIcon(item, true);
+            loadTreeItemContent(item);
         } else if (event.getEventType().equals(TreeItem.branchCollapsedEvent())) {
-            setFolderExpandedIcon(expandItem, false);
+            System.out.println("-------- collapse item: " + item.getValue().getName());
+            setFolderExpandedIcon(item, false);
         }
     }
 
@@ -191,7 +192,9 @@ public class MainViewController implements Initializable {
     }
 
     private void handleLoadEmailEvent(TreeItem<Component> item) {
-        System.out.println("Selected Text : " + item.getValue());
-        folderManager.printFolderContent((Folder) item.getValue());
+        if (item != null) {
+            System.out.println("Selected Text : " + item.getValue());
+            folderManager.printFolderContent((Folder) item.getValue());
+        }
     }
 }
