@@ -29,6 +29,12 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+/**
+ * Controller for main application builded with FXML document FXMLMainView
+ * 
+* @author Lukas Abegg, S53647, FPA - Beuth Hochschule
+ * @version 1.0
+ */
 public class MainViewController implements Initializable {
 
     @FXML
@@ -37,38 +43,47 @@ public class MainViewController implements Initializable {
     @FXML
     private MenuBar menuBar;
 
-    private FolderManagerIF folderManager;
+    private FolderManagerIF folderManager; /* FileManager for holding folder model */
 
-    private static Image FOLDERICON;
-    private static Image FILEICON;
-    private static File DEFAULTROOT;
+    private static Image FOLDERICON; /* Image icon for folders */
+
+    private static Image FILEICON; /* Image icon for files */
+
+    private static File DEFAULTROOT; /* default root path */
 
     private final List<File> historyList = new ArrayList<>();
 
+    /**
+     * Constructor method
+     */
     public MainViewController() {
         FOLDERICON = new Image(getClass().getResourceAsStream("folder_icon.png"));
         FILEICON = new Image(getClass().getResourceAsStream("file_icon.png"));
         DEFAULTROOT = new File("/Users");
     }
 
+    /**
+     * Initiate TreeView with default root path
+     *
+     * @param url application URL
+     * @param rb bundle for handling language translations
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        configureTree();
-        configureMenue();
-    }
-
-    public void configureTree() {
-        setRootItemTreeView(DEFAULTROOT);
+        configureTree(DEFAULTROOT); /* set root item in TreeView */
+        configureMenue(); /* set menu in application */
     }
 
     /**
+     * Configure root item and TreeItem handlers
      *
-     * @param rootPath
+     * @param rootPath path to root item as String
      */
-    public void setRootItemTreeView(File rootPath) {
+    public void configureTree(File rootPath) {
         folderManager = new FileManager(rootPath);
         TreeItem<Component> rootItem = new TreeItem<>(folderManager.getTopFodler(), new ImageView(FOLDERICON));
         rootItem.setExpanded(true);
+        /* set event handler for TreeItem expanding */
         rootItem.addEventHandler(TreeItem.branchExpandedEvent(), (TreeModificationEvent<Component> e) -> handleTreeItemExpandedEvent(e));
         explorerTreeView.setRoot(rootItem);
 
@@ -91,7 +106,7 @@ public class MainViewController implements Initializable {
 
     private void loadTreeItemContent(TreeItem<Component> node) {
         Folder folder = (Folder) node.getValue();
-        node.getChildren().removeAll(node.getChildren().sorted());
+        node.getChildren().removeAll(node.getChildren());
         TreeItem<Component> dummyItem = new TreeItem<>(new Folder(new File("/"), true));
 
         folderManager.loadContent(folder);
@@ -138,7 +153,7 @@ public class MainViewController implements Initializable {
                 File file = openFile();
                 if (file != null) {
                     System.out.println("Root Item set on: " + file.getAbsolutePath());
-                    setRootItemTreeView(file);
+                    configureTree(file);
                 }
                 break;
             }

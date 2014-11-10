@@ -73,7 +73,7 @@ public class BaseDirHistoryViewController implements Initializable {
 
         switch (b.getId()) {
             case BUTTON_OK: {
-                mainController.setRootItemTreeView(listView.getSelectionModel().getSelectedItem());
+                mainController.configureTree(listView.getSelectionModel().getSelectedItem());
                 close(okButton.getScene().getWindow());
             }
             case BUTTON_CANCEL: {

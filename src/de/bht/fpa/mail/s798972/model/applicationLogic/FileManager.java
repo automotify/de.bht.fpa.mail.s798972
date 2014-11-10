@@ -23,7 +23,7 @@ public class FileManager implements FolderManagerIF {
     public FileManager(File file) {
         topFolder = new Folder(file, true);
     }
-    
+
     @Override
     public Folder getTopFodler() {
         return topFolder;
@@ -54,14 +54,8 @@ public class FileManager implements FolderManagerIF {
             }
         }
     }
-    
+
     private Boolean hasSubFiles(File path) {
-        try {
-            return path.list().length > 0;
-        } catch (Exception e) {
-            System.out.println(path.getName());
-            System.out.println("Error by reading length of: " + e.getMessage());
-        }
-        return false;
+        return path.listFiles() != null;
     }
 }
