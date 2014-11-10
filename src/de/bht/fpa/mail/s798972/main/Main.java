@@ -8,9 +8,20 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 
-
+/**
+ * Main class to start Application
+ * 
+ * @author Lukas Abegg, S53647, FPA - Beuth Hochschule
+ * @version 1.0
+ */
 public class Main extends Application {
     
+    /**
+     * Initiate and load the application in stage window
+     * 
+     * @param stage the application window object 
+     * @throws Exception all exceptions thrown in stage object
+     */
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("/de/bht/fpa/mail/s798972/view/FXMLMainView.fxml"));
@@ -23,6 +34,8 @@ public class Main extends Application {
     }
 
     /**
+     * Starter method
+     * 
      * @param args the command line arguments
      */
     public static void main(String[] args) {
