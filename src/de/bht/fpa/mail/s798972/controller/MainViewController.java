@@ -120,9 +120,9 @@ public class MainViewController implements Initializable {
      * @param node TreeItem node which is expanded
      */
     private void loadTreeItemContent(TreeItem<Component> node) {
-        Folder folder = (Folder) node.getValue(); /* clear TreeItem node before appending new children */
+        Folder folder = (Folder) node.getValue(); 
+        node.getChildren().removeAll(node.getChildren()); /* clear TreeItem node before appending new children */
 
-        node.getChildren().removeAll(node.getChildren());
         TreeItem<Component> dummyItem = new TreeItem<>(new Folder(new File("/"), true));  /* is needed to show node expandable before children will be loaded */
 
         folderManager.loadContent(folder); /* load all children of folder */
