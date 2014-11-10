@@ -93,7 +93,7 @@ public class MainViewController implements Initializable {
 
     private void loadTreeItemContent(TreeItem<Component> node) {
         Folder folder = (Folder) node.getValue();
-        node.getChildren().removeAll(node.getChildren().sorted());
+        node.getChildren().removeAll(node.getChildren());
         TreeItem<Component> dummyItem = new TreeItem<>(new Folder(new File("/"), true));
 
         folderManager.loadContent(folder);
