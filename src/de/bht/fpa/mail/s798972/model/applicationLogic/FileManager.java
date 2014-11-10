@@ -1,17 +1,16 @@
+package de.bht.fpa.mail.s798972.model.applicationLogic;
+
+import de.bht.fpa.mail.s798972.model.data.Folder;
+import java.io.File;
+
 /*
  * This class manages a hierarchy of folders and their content which is loaded 
  * from a given directory path
  */
-package de.bht.fpa.mail.s798972.model.applicationLogic;
-
-import de.bht.fpa.mail.s798972.model.data.FileElement;
-import de.bht.fpa.mail.s798972.model.data.Folder;
-import java.io.File;
-
 public class FileManager implements FolderManagerIF {
 
-    //top Folder of the managed hierarchy
-    private final Folder topFolder;
+    private final Folder topFolder; /* top Folder of the managed hierarchy */
+
 
     /**
      * Constructs a new FileManager object which manages a folder hierarchy,
@@ -24,6 +23,11 @@ public class FileManager implements FolderManagerIF {
         topFolder = new Folder(file, true);
     }
 
+    /**
+     * Get root folder and return it
+     *
+     * @return Folder root item
+     */
     @Override
     public Folder getTopFodler() {
         return topFolder;
@@ -38,30 +42,42 @@ public class FileManager implements FolderManagerIF {
      */
     @Override
     public void loadContent(Folder f) {
-        if (hasSubFiles(new File(f.getPath()))) {
-            f.getComponents().removeAll(f.getComponents());
-            for (final File path : new File(f.getPath()).listFiles()) {
-                if (path.getName().startsWith(".")) {
-                    continue; // keine versteckten Files anzeigen
+        File path = new File(f.getPath());
+
+        /* check first if directory has sub files */
+        if (hasSubFiles(path)) {
+            f.getComponents().removeAll(f.getComponents()); /* remove old Components */
+
+            /* Search for all directories in Folder f */
+            for (File file : path.listFiles()) {
+                if (file.getName().startsWith(".")) {
+                    continue; /* ignore all hidden files */
+
                 }
-                if (path.isDirectory()) {
-                    final Folder subFolder = new Folder(path, hasSubFiles(path));
+                /* add all directories to folder */
+                if (file.isDirectory()) {
+                    Folder subFolder = new Folder(file, hasSubFiles(file));
                     f.addComponent(subFolder);
-                } else {
-                    final FileElement subFile = new FileElement(path);
-                    f.addComponent(subFile);
                 }
             }
         }
     }
 
+    /**
+     * check if File path is empty or not
+     *
+     * @param path File object to check
+     * @return if directory have sub files or is empty
+     */
     private Boolean hasSubFiles(File path) {
-        try {
-            return path.list().length > 0;
-        } catch (Exception e) {
-            System.out.println(path.getName());
-            System.out.println("Error by reading length of: " + e.getMessage());
+        /* search for directories in directory path */
+        for (File f : path.listFiles()) {
+            if (f.isDirectory()) {
+                return true; /* return true if there is a sub directory */
+
+            }
         }
-        return false;
+        return false; /* otherwise return false */
+
     }
 }

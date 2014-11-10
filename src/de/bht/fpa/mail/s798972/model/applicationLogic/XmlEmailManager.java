@@ -7,91 +7,59 @@ import java.util.List;
 import javax.xml.bind.DataBindingException;
 import javax.xml.bind.JAXB;
 
+/*
+ * This is the interface for classes that manage
+ * email functions.
+ */
 public class XmlEmailManager implements EmailManagerIF {
 
-    //top Folder of the managed hierarchy
-    private final Folder topFolder;
-
     /**
-     * Constructs a new FileManager object which manages a folder hierarchy,
-     * where file contains the path to the top directory. The contents of the
-     * directory file are loaded into the top folder
+     * Loads all relevant email in the directory path of a folder into the
+     * folder.
      *
-     * @param file File which points to the top directory
-     */
-    public XmlEmailManager(File file) {
-        topFolder = new Folder(file, true);
-    }
-
-    @Override
-    public Folder getTopFodler() {
-        return topFolder;
-    }
-
-    /**
-     * Loads all relevant content in the directory path of a folder object into
-     * the folder.
-     *
-     * @param folder the folder into which the content of the corresponding
-     * directory should be loaded
+     * @param folder the folder which should be checked for email
+     * @return changed folder with all email added
      */
     @Override
-    public void loadContent(Folder folder) {
-        if (hasSubFolders(new File(folder.getPath()))) {
-            folder.getComponents().removeAll(folder.getComponents());
-            for (final File path : new File(folder.getPath()).listFiles()) {
-                if (path.isDirectory()) {
-                    final Folder subFolder = new Folder(path, hasSubFolders(path));
-                    folder.addComponent(subFolder);
-                }
-            }
-        }
-    }
+    public Folder loadEmails(Folder folder) {
+        File path = new File(folder.getPath());
 
-    private Boolean hasSubFolders(File path) {
-        try {
-            for (File f : path.listFiles()) {
-                if (f.isDirectory()) {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            System.out.println(path.getName());
-            System.out.println("Permission error by reading length of: " + e.getMessage());
-        }
-        return false;
-    }
-
-    @Override
-    public void loadEmails(Folder folder) {
-        for (File f : new File(folder.getPath()).listFiles()) {
+        /* Loop through all files of directory and search for emails */
+        for (File f : path.listFiles()) {
+            /* handle emails, all of theme ends with .xml */
             if (f.isFile() && f.getName().endsWith(".xml")) {
                 try {
-                    folder.addEmail(JAXB.unmarshal(f, Email.class));
+                    folder.addEmail(JAXB.unmarshal(f, Email.class)); /* read XML object and add email object to folder */
+
                 } catch (DataBindingException e) {
                     System.out.println("XML is not conform, error see below: " + e.getMessage());
                 }
             }
         }
+        return folder; /* return folder filled with found emails */
+
     }
 
+    /**
+     * Print folder content with all email
+     *
+     * @param folder the folder to get all of theme email component
+     */
     @Override
     public void printFolderContent(Folder folder) {
-        if (folder.getEmails().isEmpty()) {
-            loadEmails(folder);
-        }
-
+        /* get all email contents in folder */
         List<Email> list = folder.getEmails();
 
-        //full path of directory
-        System.out.println("Selected directory: " + folder.getPath());
-        //number of emails
-        System.out.println("Number of emails: " + folder.getEmails().size());
+        /* Print all emails */
+        System.out.println("Selected directory: " + folder.getPath()); /* full path of directory */
 
-        //list emails
+        System.out.println("Number of emails: " + folder.getEmails().size()); /* number of emails */
+
+        /* print all email elements */
         for (Email email : list) {
             System.out.printf("[Email: sender=%s received=%s subject=%s] %n", email.getSender(), email.getReceived(), email.getSubject());
         }
         System.out.println("End of check for emails.................");
     }
+
 }

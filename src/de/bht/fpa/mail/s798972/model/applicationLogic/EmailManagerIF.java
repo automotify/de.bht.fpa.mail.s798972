@@ -1,43 +1,26 @@
 package de.bht.fpa.mail.s798972.model.applicationLogic;
 
-/*
- * This is the interface for classes that manage
- * folders.
- */
 import de.bht.fpa.mail.s798972.model.data.Folder;
 
+/*
+ * This is the interface for classes that manage
+ * email functions.
+ */
 public interface EmailManagerIF {
 
     /**
-     * Get current root folder.
-     *
-     * @return current root folder.
-     */
-    public Folder getTopFodler();
-
-    /**
-     * Loads all relevant content in the directory path of a folder into the
+     * Loads all relevant email in the directory path of a folder into the
      * folder.
      *
-     * @param f the folder into which the content of the corresponding directory
-     * should be loaded
+     * @param f the folder which should be checked for email
+     * @return changed folder with all email added
      */
-    public void loadContent(Folder f);
+    public Folder loadEmails(Folder f);
 
     /**
-     * Loads all relevant emails in the directory path of a folder into the
-     * folder.
+     * Print folder content with all email
      *
-     * @param f the folder into which the emails of the corresponding directory
-     * should be loaded
-     */
-    public void loadEmails(Folder f);
-    
-    /**
-     * Print folder content
-     *
-     * @param f the folder into which the content of the corresponding directory
-     * should be loaded
+     * @param f the folder to get all of theme email component
      */
     public void printFolderContent(Folder f);
 }
