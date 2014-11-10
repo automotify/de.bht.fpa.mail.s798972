@@ -6,7 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * 
+ * This is the leaf node part of a composite pattern.
+ *
+ * @author Lukas Abegg, S53647, FPA - Beuth Hochschule
+ * @version 1.0
  */
 public class Folder extends Component {
 

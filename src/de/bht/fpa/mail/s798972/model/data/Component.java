@@ -4,10 +4,12 @@ package de.bht.fpa.mail.s798972.model.data;
 import java.io.File;
 import java.util.List;
 
-/*
+/**
  * This is the component part of a composite pattern.
+ *
+ * @author Lukas Abegg, S53647, FPA - Beuth Hochschule
+ * @version 1.0
  */
-
 public abstract class Component {
     // absolute directory path to this component
     private String path;
