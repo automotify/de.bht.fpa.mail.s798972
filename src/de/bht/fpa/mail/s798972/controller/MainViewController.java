@@ -15,21 +15,36 @@ import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+/**
+ * Controller for main application builded with FXML document FXMLMainView
+ * 
+* @author Lukas Abegg, S53647, FPA - Beuth Hochschule
+ * @version 1.0
+ */
 public class MainViewController implements Initializable {
 
     @FXML
     private TreeView explorerTreeView;
 
-    private static Image FOLDERICON;
+    private static Image FOLDERICON; 
     private static Image FILEICON;
-    private static File DEFAULTROOT;
+    private static File DEFAULTROOT;    /* default root path */
 
+    /**
+     * 
+     */
     public MainViewController() {
         FOLDERICON = new Image(getClass().getResourceAsStream("folder_icon.png"));
         FILEICON = new Image(getClass().getResourceAsStream("file_icon.png"));
         DEFAULTROOT = new File("/Users");
     }
 
+    /**
+     * Call initiation methods and set default parameters for main view
+     *     
+     * @param url application url
+     * @param rb bundle for handling language translations
+     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         configureTree();
